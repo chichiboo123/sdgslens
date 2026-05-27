@@ -4,7 +4,7 @@ const I18N = {
     htmlLang: 'ko',
     brand: {
       title: 'SDGs <span>렌즈</span>',
-      subtitle: '세계 뉴스를 SDGs로 읽다 · SDGs Lens',
+      subtitle: 'SDGs 렌즈로 살펴보는 세계 뉴스',
     },
     meta: { streak: '탐구 완료' },
     steps: {
@@ -26,6 +26,7 @@ const I18N = {
       hintHide: '힌트 숨기기',
       analyze: 'SDGs 렌즈로 분석하기',
       next: '다음 뉴스 탐구하기',
+      retry: '이 뉴스 다시 풀기',
     },
     sdg: {
       heading: '이 기사와 관련 있는 SDGs를 골라보세요',
@@ -46,7 +47,7 @@ const I18N = {
       try: '다음엔 더 잘할 수 있어요!',
     },
     footer: {
-      madeBy: 'made by.',
+      creator: '교육뮤지컬 꿈꾸는 치수쌤',
       purpose: '세계시민 교육을 위한 비영리 학습 도구입니다.',
     },
     help: {
@@ -67,7 +68,7 @@ const I18N = {
     htmlLang: 'en',
     brand: {
       title: 'SDGs <span>Lens</span>',
-      subtitle: 'Read world news through the SDGs',
+      subtitle: 'World news through the SDGs Lens',
     },
     meta: { streak: 'Completed' },
     steps: { s1: 'Read News', s2: 'Pick SDGs', s3: 'See Results' },
@@ -85,6 +86,7 @@ const I18N = {
       hintHide: 'Hide Hint',
       analyze: 'Analyze with SDGs Lens',
       next: 'Explore Next News',
+      retry: 'Retry this news',
     },
     sdg: {
       heading: 'Which SDGs relate to this article?',
@@ -105,7 +107,7 @@ const I18N = {
       try: 'You can do even better next time!',
     },
     footer: {
-      madeBy: 'made by.',
+      creator: 'Edu-Musical Dreaming Teacher Chisu',
       purpose: 'A non-profit learning tool for global citizenship education.',
     },
     help: {
@@ -126,7 +128,7 @@ const I18N = {
     htmlLang: 'ja',
     brand: {
       title: 'SDGs <span>レンズ</span>',
-      subtitle: '世界のニュースをSDGsで読み解く',
+      subtitle: 'SDGsレンズで読み解く世界のニュース',
     },
     meta: { streak: '探究完了' },
     steps: { s1: 'ニュースを読む', s2: 'SDGsを選ぶ', s3: '結果を見る' },
@@ -144,6 +146,7 @@ const I18N = {
       hintHide: 'ヒントを隠す',
       analyze: 'SDGsレンズで分析',
       next: '次のニュースへ',
+      retry: 'このニュースをやり直す',
     },
     sdg: {
       heading: 'この記事に関係するSDGsを選ぼう',
@@ -164,7 +167,7 @@ const I18N = {
       try: '次はもっとよくできるよ!',
     },
     footer: {
-      madeBy: 'made by.',
+      creator: '教育ミュージカル 夢見るチス先生',
       purpose: 'グローバル市民教育のための非営利学習ツールです。',
     },
     help: {
