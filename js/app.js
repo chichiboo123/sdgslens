@@ -114,6 +114,26 @@ function toggleHint() {
   refreshActionLabels();
 }
 
+/* ---------------- News locale helper ---------------- */
+// Returns localized fields for cur news item, falling back to 'ko' if lang not present.
+function newsLoc(item, lang) {
+  if (item.i18n) {
+    return item.i18n[lang] || item.i18n['ko'];
+  }
+  // Legacy flat format (Korean only)
+  return {
+    source: item.source, title: item.title, body: item.body,
+    hint: item.hint, fc: item.fc, fp: item.fp, fm: item.fm,
+    lc: item.lc, bonus: item.bonus,
+  };
+}
+function newsTags(item, lang) {
+  if (item.tags && !Array.isArray(item.tags)) {
+    return item.tags[lang] || item.tags['ko'];
+  }
+  return item.tags || [];
+}
+
 /* ---------------- News ---------------- */
 function fetchNews() {
   const btn = $('fetch-btn');
@@ -149,11 +169,11 @@ function fetchNews() {
 
 function renderNews() {
   if (!cur) return;
-  const loc = cur.i18n[CURRENT_LANG];
+  const loc = newsLoc(cur, CURRENT_LANG);
   $('nsrc-txt').textContent = loc.source;
   $('ntitle').textContent = loc.title;
   $('nbody').textContent = loc.body;
-  $('ntags').innerHTML = cur.tags[CURRENT_LANG].map(x => `<span class="ntag">#${x}</span>`).join('');
+  $('ntags').innerHTML = newsTags(cur, CURRENT_LANG).map(x => `<span class="ntag">#${x}</span>`).join('');
   const nl = $('nlink');
   nl.href = cur.url; nl.style.display = 'inline-flex';
   if (hintOpen) $('hint-box').textContent = loc.hint;
@@ -166,7 +186,7 @@ function analyze() {
   const correct = cur.correct;
   const hit = sel.filter(n => correct.includes(n));
   const pct = Math.round((hit.length/correct.length)*100);
-  const loc = cur.i18n[CURRENT_LANG];
+  const loc = newsLoc(cur, CURRENT_LANG);
 
   let feedback, ico, label;
   if (hit.length === correct.length && sel.length === correct.length) {
