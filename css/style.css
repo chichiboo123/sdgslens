@@ -794,6 +794,51 @@ button { font-family: inherit; cursor: pointer; }
   .lang-btn { padding: 8px 11px; }
 }
 
+/* ── Compact lang popup (narrow screens) ── */
+.lang-popup {
+  position: fixed;
+  z-index: 200;
+  background: var(--bg);
+  border-radius: 14px;
+  border: 2px solid var(--border2);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 72px;
+  animation: panel-in .2s cubic-bezier(.34,1.56,.64,1);
+}
+.lang-popup.open { display: flex; }
+.lang-pop-btn {
+  padding: 10px 18px;
+  font-size: 12px; font-weight: 800;
+  border: none; background: transparent;
+  color: var(--text2); font-family: inherit;
+  cursor: pointer; letter-spacing: .04em;
+  transition: all .15s;
+}
+.lang-pop-btn:hover { background: var(--purple-bg); color: var(--purple); }
+.lang-pop-btn.active { background: var(--grad-primary); color: white; }
+
+@media (max-width: 480px) {
+  .lang-switch .lang-btn:not(.active) { display: none; }
+  .lang-btn.active { position: relative; padding-right: 22px; }
+  .lang-btn.active::after {
+    content: 'expand_more';
+    font-family: 'Material Symbols Rounded';
+    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
+    position: absolute; right: 3px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px; line-height: 1;
+    pointer-events: none;
+  }
+  #brand-text p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 /* ── Dark mode adjustments (kept gentle) ── */
 @media (prefers-color-scheme: dark) {
   :root {
