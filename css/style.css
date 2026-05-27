@@ -794,49 +794,62 @@ button { font-family: inherit; cursor: pointer; }
   .lang-btn { padding: 8px 11px; }
 }
 
-/* ── Compact lang popup (narrow screens) ── */
-.lang-popup {
+/* ── Mobile hamburger menu ── */
+#menu-btn { display: none; }
+
+#menu-panel {
   position: fixed;
-  z-index: 200;
+  z-index: 150;
   background: var(--bg);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   border: 2px solid var(--border2);
   box-shadow: var(--shadow-lg);
-  display: none;
+  padding: 12px;
+  display: flex;
   flex-direction: column;
-  overflow: hidden;
-  min-width: 72px;
-  animation: panel-in .2s cubic-bezier(.34,1.56,.64,1);
+  gap: 6px;
+  min-width: 160px;
+  animation: panel-in .22s cubic-bezier(.34,1.56,.64,1);
 }
-.lang-popup.open { display: flex; }
-.lang-pop-btn {
-  padding: 10px 18px;
+#menu-panel[hidden] { display: none; }
+.mpanel-lang {
+  display: flex;
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.mpanel-lang-btn {
+  flex: 1;
+  padding: 9px 6px;
   font-size: 12px; font-weight: 800;
   border: none; background: transparent;
   color: var(--text2); font-family: inherit;
   cursor: pointer; letter-spacing: .04em;
   transition: all .15s;
 }
-.lang-pop-btn:hover { background: var(--purple-bg); color: var(--purple); }
-.lang-pop-btn.active { background: var(--grad-primary); color: white; }
+.mpanel-lang-btn:hover { background: var(--purple-bg); color: var(--purple); }
+.mpanel-lang-btn.active { background: var(--grad-primary); color: white; }
+.mpanel-divider { height: 1.5px; background: var(--border); border-radius: 2px; margin: 2px 0; }
+.mpanel-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 10px 12px;
+  border: none; background: transparent;
+  font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--text2); cursor: pointer;
+  border-radius: 12px; text-align: left;
+  transition: all .15s;
+}
+.mpanel-btn:hover { background: var(--purple-bg); color: var(--purple); }
+.mpanel-btn .material-symbols-rounded { font-size: 20px; flex-shrink: 0; }
+.mpanel-btn-dict .material-symbols-rounded { color: var(--pink); font-variation-settings: 'FILL' 1; }
+.mpanel-btn-help .material-symbols-rounded { color: var(--purple); }
 
 @media (max-width: 480px) {
-  .lang-switch .lang-btn:not(.active) { display: none; }
-  .lang-btn.active { position: relative; padding-right: 22px; }
-  .lang-btn.active::after {
-    content: 'expand_more';
-    font-family: 'Material Symbols Rounded';
-    font-variation-settings: 'FILL' 0, 'wght' 600, 'GRAD' 0, 'opsz' 24;
-    position: absolute; right: 3px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 14px; line-height: 1;
-    pointer-events: none;
-  }
-  #brand-text p {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  #menu-btn { display: inline-flex; }
+  .lang-switch, #dict-btn, #help-btn { display: none !important; }
+  #brand-text p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 
 /* ── Dark mode adjustments (kept gentle) ── */

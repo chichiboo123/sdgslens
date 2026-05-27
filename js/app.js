@@ -363,42 +363,62 @@ function init() {
     else b.classList.remove('active');
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeHelp(); closeDict(); closeLangPopup(); }
+    if (e.key === 'Escape') { closeHelp(); closeDict(); closeMenu(); }
   });
 
-  // Compact lang popup for narrow screens
-  const popup = document.createElement('div');
-  popup.className = 'lang-popup';
-  popup.id = 'lang-popup';
-  ['ko','en','ja'].forEach(lang => {
-    const b = document.createElement('button');
-    b.className = 'lang-pop-btn';
-    b.dataset.lang = lang;
-    b.textContent = lang.toUpperCase();
-    b.addEventListener('click', () => { switchLang(lang); closeLangPopup(); });
-    popup.appendChild(b);
-  });
-  document.body.appendChild(popup);
+  // Mobile hamburger menu
+  const menuBtn = $('menu-btn');
+  const menuPanel = document.createElement('div');
+  menuPanel.id = 'menu-panel';
+  menuPanel.hidden = true;
+  document.body.appendChild(menuPanel);
 
-  function closeLangPopup() { popup.classList.remove('open'); }
-  function updatePopupActive() {
-    popup.querySelectorAll('.lang-pop-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.lang === CURRENT_LANG);
+  function buildMenuPanel() {
+    const D = SDG_DICT[CURRENT_LANG] || SDG_DICT.ko;
+    menuPanel.innerHTML = `
+      <div class="mpanel-lang">
+        <button class="mpanel-lang-btn${CURRENT_LANG==='ko'?' active':''}" data-lang="ko">KO</button>
+        <button class="mpanel-lang-btn${CURRENT_LANG==='en'?' active':''}" data-lang="en">EN</button>
+        <button class="mpanel-lang-btn${CURRENT_LANG==='ja'?' active':''}" data-lang="ja">JA</button>
+      </div>
+      <div class="mpanel-divider"></div>
+      <button class="mpanel-btn mpanel-btn-dict" id="mpanel-dict-btn">
+        <span class="material-symbols-rounded">menu_book</span>
+        <span>${D.ui.title}</span>
+      </button>
+      <button class="mpanel-btn mpanel-btn-help" id="mpanel-help-btn">
+        <span class="material-symbols-rounded">help</span>
+        <span>${I18N[CURRENT_LANG].help.title}</span>
+      </button>
+    `;
+    menuPanel.querySelectorAll('.mpanel-lang-btn').forEach(b => {
+      b.addEventListener('click', () => { switchLang(b.dataset.lang); buildMenuPanel(); });
     });
+    $('mpanel-dict-btn').addEventListener('click', () => { closeMenu(); openDict(); });
+    $('mpanel-help-btn').addEventListener('click', () => { closeMenu(); openHelp(); });
   }
 
-  const langSwitch = document.querySelector('.lang-switch');
-  langSwitch.addEventListener('click', e => {
-    if (window.innerWidth > 480) return;
-    const rect = langSwitch.getBoundingClientRect();
-    updatePopupActive();
-    popup.style.top = (rect.bottom + 6) + 'px';
-    popup.style.left = rect.left + 'px';
-    popup.classList.toggle('open');
+  function openMenu() {
+    buildMenuPanel();
+    const rect = menuBtn.getBoundingClientRect();
+    menuPanel.style.top = (rect.bottom + 6) + 'px';
+    menuPanel.style.right = (window.innerWidth - rect.right) + 'px';
+    menuPanel.style.left = 'auto';
+    menuPanel.hidden = false;
+    menuBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeMenu() {
+    menuPanel.hidden = true;
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+
+  menuBtn.addEventListener('click', e => {
+    menuPanel.hidden ? openMenu() : closeMenu();
     e.stopPropagation();
   });
 
-  document.addEventListener('click', closeLangPopup);
+  document.addEventListener('click', closeMenu);
 }
 
 document.addEventListener('DOMContentLoaded', init);
