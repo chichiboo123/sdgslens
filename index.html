@@ -25,14 +25,17 @@
       </div>
     </div>
     <div class="top-actions">
-      <button class="icon-btn" id="help-btn" aria-label="help">
-        <span class="material-symbols-rounded">help</span>
-      </button>
       <div class="lang-switch" role="group" aria-label="Language">
         <button data-lang="ko" class="lang-btn active">KO</button>
         <button data-lang="en" class="lang-btn">EN</button>
         <button data-lang="ja" class="lang-btn">JA</button>
       </div>
+      <button class="icon-btn icon-btn-dict" id="dict-btn" aria-label="SDGs dictionary" title="SDGs">
+        <span class="material-symbols-rounded">menu_book</span>
+      </button>
+      <button class="icon-btn" id="help-btn" aria-label="help">
+        <span class="material-symbols-rounded">help</span>
+      </button>
     </div>
   </header>
 
@@ -174,7 +177,19 @@
   </div>
 </div>
 
+<div class="modal" id="dict-modal" hidden>
+  <div class="modal-back" data-close="1"></div>
+  <div class="modal-panel modal-panel-wide" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3><span class="material-symbols-rounded">menu_book</span> <span id="dict-title"></span></h3>
+      <button class="icon-btn" data-close="1" aria-label="close"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <div class="modal-body" id="dict-body"></div>
+  </div>
+</div>
+
 <script src="js/i18n.js"></script>
+<script src="js/sdg-dict.js"></script>
 <script src="js/news-data.js"></script>
 <script src="js/app.js"></script>
 </body>

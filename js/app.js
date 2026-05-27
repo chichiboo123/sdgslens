@@ -267,6 +267,64 @@ function retryNews() {
 function openHelp() { $('help-modal').hidden = false; }
 function closeHelp() { $('help-modal').hidden = true; }
 
+function openDict() {
+  renderDict();
+  $('dict-modal').hidden = false;
+}
+function closeDict() { $('dict-modal').hidden = true; }
+
+function renderDict() {
+  const D = SDG_DICT[CURRENT_LANG] || SDG_DICT.ko;
+  $('dict-title').textContent = D.ui.title;
+  const body = $('dict-body');
+
+  const introKeys = D.intro.keys.map(o =>
+    `<div class="dict-key"><span class="dict-k">${o.k}</span><span class="dict-v">${o.v}</span></div>`
+  ).join('');
+  const introBody = D.intro.body.map(p => `<p>${p}</p>`).join('');
+
+  const goals = D.goals.map((g, i) => {
+    const n = i + 1;
+    const color = SDG_COLORS[i];
+    const targets = g.targets.map(t => `<li>${t}</li>`).join('');
+    return `
+      <details class="dict-goal" style="--gc:${color}">
+        <summary>
+          <span class="dict-badge" style="background:${color}">${n}</span>
+          <span class="dict-gname">${g.name}</span>
+          <span class="material-symbols-rounded dict-chev">expand_more</span>
+        </summary>
+        <div class="dict-goal-body">
+          <p class="dict-gdesc">${g.desc}</p>
+          <div class="dict-tlabel">${D.ui.targetsLabel}</div>
+          <ul class="dict-targets">${targets}</ul>
+        </div>
+      </details>`;
+  }).join('');
+
+  const sources = D.sources.list.map(s => `<li>${s}</li>`).join('');
+
+  body.innerHTML = `
+    <section class="dict-intro">
+      <h4>${D.ui.introHeading}</h4>
+      <div class="dict-intro-card">
+        ${introBody}
+        <div class="dict-keys">${introKeys}</div>
+      </div>
+    </section>
+    <section class="dict-goals-sec">
+      <h4>${D.ui.goalsHeading}</h4>
+      <p class="dict-hint"><span class="material-symbols-rounded">touch_app</span> ${D.ui.tapHint}</p>
+      <div class="dict-goals">${goals}</div>
+    </section>
+    <section class="dict-sources">
+      <h4><span class="material-symbols-rounded">verified</span> ${D.sources.title}</h4>
+      <ul>${sources}</ul>
+      <p class="dict-note">${D.sources.note}</p>
+    </section>
+  `;
+}
+
 /* ---------------- Language switch ---------------- */
 function switchLang(lang) {
   CURRENT_LANG = lang;
@@ -275,6 +333,7 @@ function switchLang(lang) {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
   applyI18n();
+  if (!$('dict-modal').hidden) renderDict();
 }
 
 /* ---------------- Init ---------------- */
@@ -295,14 +354,16 @@ function init() {
   $('next-btn').addEventListener('click', nextNews);
   $('retry-btn').addEventListener('click', retryNews);
   $('help-btn').addEventListener('click', openHelp);
-  document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeHelp));
+  $('dict-btn').addEventListener('click', openDict);
+  $('help-modal').querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeHelp));
+  $('dict-modal').querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeDict));
   document.querySelectorAll('.lang-btn').forEach(b => {
     b.addEventListener('click', () => switchLang(b.dataset.lang));
     if (b.dataset.lang === CURRENT_LANG) b.classList.add('active');
     else b.classList.remove('active');
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeHelp();
+    if (e.key === 'Escape') { closeHelp(); closeDict(); }
   });
 }
 
