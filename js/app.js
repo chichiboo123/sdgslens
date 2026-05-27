@@ -363,8 +363,42 @@ function init() {
     else b.classList.remove('active');
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeHelp(); closeDict(); }
+    if (e.key === 'Escape') { closeHelp(); closeDict(); closeLangPopup(); }
   });
+
+  // Compact lang popup for narrow screens
+  const popup = document.createElement('div');
+  popup.className = 'lang-popup';
+  popup.id = 'lang-popup';
+  ['ko','en','ja'].forEach(lang => {
+    const b = document.createElement('button');
+    b.className = 'lang-pop-btn';
+    b.dataset.lang = lang;
+    b.textContent = lang.toUpperCase();
+    b.addEventListener('click', () => { switchLang(lang); closeLangPopup(); });
+    popup.appendChild(b);
+  });
+  document.body.appendChild(popup);
+
+  function closeLangPopup() { popup.classList.remove('open'); }
+  function updatePopupActive() {
+    popup.querySelectorAll('.lang-pop-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === CURRENT_LANG);
+    });
+  }
+
+  const langSwitch = document.querySelector('.lang-switch');
+  langSwitch.addEventListener('click', e => {
+    if (window.innerWidth > 480) return;
+    const rect = langSwitch.getBoundingClientRect();
+    updatePopupActive();
+    popup.style.top = (rect.bottom + 6) + 'px';
+    popup.style.left = rect.left + 'px';
+    popup.classList.toggle('open');
+    e.stopPropagation();
+  });
+
+  document.addEventListener('click', closeLangPopup);
 }
 
 document.addEventListener('DOMContentLoaded', init);
