@@ -94,7 +94,11 @@
   </div>
 
   <section id="sdg-sec">
-    <h2><span class="material-symbols-rounded">checklist</span> <span data-i18n="sdg.heading"></span></h2>
+    <h2>
+      <span class="material-symbols-rounded">checklist</span>
+      <span data-i18n="sdg.heading"></span>
+      <span class="sel-count" id="sel-count" hidden><b id="sel-num">0</b></span>
+    </h2>
     <p class="sec-help" data-i18n="sdg.help"></p>
     <div id="sdg-grid"></div>
   </section>
@@ -131,16 +135,23 @@
       <div class="rc-label" data-i18n="result.bonusTitle"></div>
       <div class="bonus-box" id="res-bonus"></div>
     </div>
-    <button id="next-btn" class="btn btn-outline-strong">
-      <span class="material-symbols-rounded">arrow_forward</span>
-      <span data-i18n="actions.next"></span>
-    </button>
+    <div class="result-actions">
+      <button id="next-btn" class="btn btn-outline-strong">
+        <span class="material-symbols-rounded">arrow_forward</span>
+        <span data-i18n="actions.next"></span>
+      </button>
+      <button id="retry-btn" class="link-btn" type="button">
+        <span class="material-symbols-rounded">refresh</span>
+        <span data-i18n="actions.retry"></span>
+      </button>
+    </div>
   </section>
 
   <footer class="site-footer">
     <p>
-      <span data-i18n="footer.madeBy"></span>
-      <a href="https://litt.ly/chichiboo" target="_blank" rel="noopener">꿈꾸는 치수쌤</a>
+      <a href="https://litt.ly/chichiboo" target="_blank" rel="noopener" class="footer-credit">
+        Created by. <span data-i18n="footer.creator"></span>
+      </a>
     </p>
     <p class="footer-sub" data-i18n="footer.purpose"></p>
   </footer>

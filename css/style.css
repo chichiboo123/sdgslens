@@ -137,6 +137,50 @@ button { font-family: inherit; cursor: pointer; }
 }
 #streak-badge .material-symbols-rounded { font-size: 16px; color: var(--amber); }
 #streak-badge b { color: var(--teal); font-weight: 700; }
+#streak-badge.zero b { color: var(--text3); }
+#streak-badge.zero .material-symbols-rounded { color: var(--text3); }
+
+.sel-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 7px;
+  border-radius: 11px;
+  background: var(--teal); color: white;
+  font-size: 12px; font-weight: 800;
+  margin-left: 6px;
+}
+.sel-count[hidden] { display: none; }
+
+#hint-btn.is-active {
+  background: var(--teal-bg);
+  color: var(--teal-text);
+  border-color: var(--teal2);
+}
+
+.result-actions {
+  display: flex; flex-direction: column;
+  gap: 10px; align-items: stretch;
+}
+.link-btn {
+  background: transparent; border: none;
+  color: var(--text3); font-size: 13px; font-weight: 600;
+  padding: 8px 10px; cursor: pointer;
+  display: none; align-items: center; justify-content: center; gap: 5px;
+  border-radius: 8px;
+  transition: color .15s, background .15s;
+}
+.link-btn:hover { color: var(--text); background: var(--bg2); }
+.link-btn .material-symbols-rounded { font-size: 16px; }
+
+.footer-credit {
+  display: inline-flex; align-items: center; gap: 4px;
+  color: var(--text2); font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px; border-radius: 8px;
+  transition: color .15s, background .15s;
+}
+.footer-credit span { color: var(--teal); }
+.footer-credit:hover { background: var(--teal-bg); color: var(--teal); }
+.footer-credit:hover span { color: var(--teal); }
 
 /* ── Steps ── */
 .steps-wrap {
@@ -281,6 +325,8 @@ button { font-family: inherit; cursor: pointer; }
   user-select: none;
 }
 .sc:hover { transform: scale(1.06); opacity: 1; }
+.sc:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; opacity: 1; }
+.sc:active { transform: scale(0.96); }
 .sc.sel {
   border-color: rgba(255,255,255,.95);
   opacity: 1; transform: scale(1.07);

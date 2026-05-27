@@ -83,8 +83,16 @@ function buildGrid() {
     d.style.background = SDG_COLORS[i];
     d.setAttribute('role','button');
     d.setAttribute('aria-pressed','false');
+    d.setAttribute('tabindex','0');
+    d.setAttribute('aria-label', `SDG ${n}`);
     d.innerHTML = `<span class="sn">${n}</span><span class="sl">${t('sdgLabels')[i]}</span>`;
     d.onclick = () => toggleSDG(n, d);
+    d.onkeydown = (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleSDG(n, d);
+      }
+    };
     g.appendChild(d);
   }
 }
@@ -102,7 +110,19 @@ function toggleSDG(n, el) {
   const show = sel.length > 0;
   $('life-sec').style.display = show ? 'block' : 'none';
   $('sub-btn').style.display = show ? 'flex' : 'none';
+  const counter = $('sel-count');
+  if (show) {
+    counter.hidden = false;
+    $('sel-num').textContent = sel.length;
+  } else {
+    counter.hidden = true;
+  }
   setStep(show ? 2 : 1);
+}
+
+function updateStreakBadge() {
+  $('cnt').textContent = done;
+  $('streak-badge').classList.toggle('zero', done === 0);
 }
 
 /* ---------------- Hint ---------------- */
@@ -110,7 +130,8 @@ function toggleHint() {
   if (!cur) return;
   hintOpen = !hintOpen;
   $('hint-box').style.display = hintOpen ? 'block' : 'none';
-  $('hint-box').textContent = cur.i18n[CURRENT_LANG].hint;
+  $('hint-box').textContent = newsLoc(cur, CURRENT_LANG).hint;
+  $('hint-btn').classList.toggle('is-active', hintOpen);
   refreshActionLabels();
 }
 
@@ -146,8 +167,11 @@ function fetchNews() {
   ['life-sec','res-sec','hint-box'].forEach(id => $(id).style.display = 'none');
   $('sub-btn').style.display = 'none';
   $('next-btn').style.display = 'none';
+  $('retry-btn').style.display = 'none';
   $('life-input').value = '';
   $('bonus-card').style.display = 'none';
+  $('sel-count').hidden = true;
+  $('hint-btn').classList.remove('is-active');
   hintOpen = false;
   setStep(1);
 
@@ -213,15 +237,30 @@ function analyze() {
   $('res-sec').style.display = 'block';
   $('next-btn').style.display = 'inline-flex';
   done++;
-  $('cnt').textContent = done;
+  updateStreakBadge();
+  $('retry-btn').style.display = 'inline-flex';
   $('res-sec').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 function nextNews() {
   $('res-sec').style.display = 'none';
   $('next-btn').style.display = 'none';
+  $('retry-btn').style.display = 'none';
   $('hint-btn').style.display = 'none';
   fetchNews();
+}
+
+function retryNews() {
+  sel = [];
+  document.querySelectorAll('.sc').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-pressed','false'); });
+  $('res-sec').style.display = 'none';
+  $('next-btn').style.display = 'none';
+  $('retry-btn').style.display = 'none';
+  $('life-sec').style.display = 'none';
+  $('sub-btn').style.display = 'none';
+  $('sel-count').hidden = true;
+  setStep(1);
+  $('news-card').scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 
 /* ---------------- Modal ---------------- */
@@ -248,11 +287,13 @@ function init() {
   buildGrid();
   applyI18n();
   setStep(1);
+  updateStreakBadge();
 
   $('fetch-btn').addEventListener('click', fetchNews);
   $('hint-btn').addEventListener('click', toggleHint);
   $('sub-btn').addEventListener('click', analyze);
   $('next-btn').addEventListener('click', nextNews);
+  $('retry-btn').addEventListener('click', retryNews);
   $('help-btn').addEventListener('click', openHelp);
   document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeHelp));
   document.querySelectorAll('.lang-btn').forEach(b => {
