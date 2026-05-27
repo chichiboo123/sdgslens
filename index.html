@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDGs 렌즈 | 세계 뉴스를 SDGs로 읽다</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg2: #f7f7f5;
+    --bg3: #f0efeb;
+    --text: #1a1a1a;
+    --text2: #6b6b6b;
+    --text3: #9a9a9a;
+    --border: rgba(0,0,0,0.10);
+    --border2: rgba(0,0,0,0.18);
+    --teal: #0F6E56;
+    --teal2: #1D9E75;
+    --teal-bg: #E1F5EE;
+    --teal-text: #085041;
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1e;
+      --bg2: #2c2c2e;
+      --bg3: #3a3a3c;
+      --text: #f2f2f7;
+      --text2: #aeaeb2;
+      --text3: #636366;
+      --border: rgba(255,255,255,0.10);
+      --border2: rgba(255,255,255,0.18);
+      --teal-bg: #083d30;
+      --teal-text: #9FE1CB;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Pretendard GOV', 'Pretendard', -apple-system, 'Noto Sans KR', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+
+  .page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  #brand { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  #brand-icon { width: 46px; height: 46px; border-radius: 12px; background: var(--teal); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  #brand-icon i { font-size: 24px; color: #9FE1CB; }
+  #brand-text h1 { font-size: 24px; font-weight: 600; color: var(--text); letter-spacing: -.4px; }
+  #brand-text h1 span { color: var(--teal); }
+  #brand-text p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  #meta-row { display: flex; align-items: center; gap: 6px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .meta-badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: var(--teal-bg); color: var(--teal-text); display: inline-flex; align-items: center; gap: 3px; font-weight: 500; }
+  #streak-badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: var(--bg2); color: var(--text2); display: inline-flex; align-items: center; gap: 3px; margin-left: auto; border: 0.5px solid var(--border); }
+
+  .steps { display: flex; gap: 5px; margin-bottom: 1.5rem; align-items: center; }
+  .sd { flex: 1; height: 3px; border-radius: 2px; background: var(--border2); transition: background .3s; }
+  .sd.on { background: var(--teal); }
+  .sd.ok { background: var(--teal2); }
+  .step-lbl { font-size: 11px; color: var(--text3); white-space: nowrap; margin-left: 8px; }
+
+  #news-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; }
+  #news-card-top { padding: 1.25rem 1.25rem 1rem; }
+  .nsrc { font-size: 11px; font-weight: 600; color: var(--teal); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px; display: flex; align-items: center; gap: 4px; }
+  .ntitle { font-size: 17px; font-weight: 600; color: var(--text); line-height: 1.45; margin-bottom: 10px; }
+  .nbody { font-size: 14px; color: var(--text2); line-height: 1.8; }
+  #news-card-foot { padding: .85rem 1.25rem; border-top: 0.5px solid var(--border); background: var(--bg2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+  .ntags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .ntag { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: var(--bg); color: var(--text2); border: 0.5px solid var(--border); }
+  .nlink { font-size: 12px; color: var(--teal); display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; text-decoration: none; font-weight: 500; }
+  .nlink:hover { text-decoration: underline; }
+
+  #hint-box { font-size: 13px; color: var(--teal-text); background: var(--teal-bg); padding: 11px 15px; margin-bottom: 1rem; line-height: 1.7; border-left: 3px solid var(--teal2); display: none; }
+
+  #action-row { display: flex; gap: 8px; margin-bottom: 1.5rem; align-items: center; }
+  .btn-outline { padding: 9px 16px; font-size: 13px; cursor: pointer; border: 0.5px solid var(--border2); border-radius: var(--radius); background: var(--bg); color: var(--text); display: inline-flex; align-items: center; gap: 6px; font-family: inherit; transition: background .15s; }
+  .btn-outline:hover { background: var(--bg2); }
+  .btn-outline:disabled { opacity: .45; cursor: not-allowed; }
+
+  #sdg-sec { margin-bottom: 1.5rem; }
+  #sdg-sec h2 { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+  #sdg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 6px; }
+  .sc { padding: 8px 3px; border-radius: 8px; border: 2px solid transparent; cursor: pointer; text-align: center; transition: transform .12s, border-color .12s, opacity .12s; opacity: .65; }
+  .sc:hover { transform: scale(1.06); opacity: .9; }
+  .sc.sel { border-color: rgba(255,255,255,.85); opacity: 1; transform: scale(1.07); }
+  .sc .sn { font-size: 15px; font-weight: 600; color: white; display: block; }
+  .sc .sl { font-size: 9px; color: rgba(255,255,255,.88); display: block; line-height: 1.2; margin-top: 1px; }
+
+  #life-sec { display: none; margin-bottom: 1.25rem; }
+  #life-sec h2 { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  #life-input { width: 100%; padding: 11px 13px; font-size: 14px; border: 0.5px solid var(--border2); border-radius: var(--radius); background: var(--bg); color: var(--text); resize: none; font-family: inherit; line-height: 1.65; }
+  #life-input:focus { outline: none; border-color: var(--teal2); }
+  .lp-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .lp { font-size: 11px; padding: 4px 10px; border: 0.5px solid var(--border2); border-radius: 20px; background: var(--bg2); cursor: pointer; color: var(--text2); font-family: inherit; transition: background .15s; }
+  .lp:hover { background: var(--bg); color: var(--text); }
+
+  #sub-btn { width: 100%; padding: 12px; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius); background: var(--teal); color: white; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 8px; margin-bottom: 1.5rem; font-family: inherit; transition: opacity .2s; }
+  #sub-btn:hover { opacity: .88; }
+
+  #res-sec { display: none; }
+  .rc { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .rc-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--text3); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .rc-label::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+  .rchips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+  .rchip { font-size: 12px; padding: 4px 10px; border-radius: 20px; color: white; font-weight: 500; }
+  .rchip.miss { opacity: .4; text-decoration: line-through; }
+  .rtext { font-size: 14px; color: var(--text2); line-height: 1.75; }
+  .life-box { font-size: 14px; color: var(--teal-text); line-height: 1.75; background: var(--teal-bg); padding: 13px 15px; border-left: 3px solid var(--teal2); white-space: pre-line; }
+  .score-row { display: flex; align-items: center; gap: 12px; padding: 12px 0 0; border-top: 0.5px solid var(--border); margin-top: 12px; }
+  .score-ico { font-size: 26px; line-height: 1; }
+  .score-num { font-size: 16px; font-weight: 600; color: var(--text); }
+  .score-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .bonus-box { font-size: 14px; color: var(--teal-text); line-height: 1.75; background: var(--teal-bg); padding: 12px 15px; border-radius: var(--radius); }
+
+  #next-btn { width: 100%; padding: 11px; font-size: 14px; border: 1.5px solid var(--teal2); border-radius: var(--radius); background: var(--bg); color: var(--teal); cursor: pointer; display: none; align-items: center; justify-content: center; gap: 6px; font-family: inherit; font-weight: 500; transition: background .15s; }
+  #next-btn:hover { background: var(--teal-bg); }
+
+  footer { text-align: center; margin-top: 3rem; font-size: 11px; color: var(--text3); }
+  footer a { color: var(--teal); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div id="brand">
+    <div id="brand-icon"><i class="ti ti-lens"></i></div>
+    <div id="brand-text">
+      <h1>SDGs <span>렌즈</span></h1>
+      <p>세계 뉴스를 SDGs로 읽다 · SDGs Lens</p>
+    </div>
+  </div>
+
+  <div id="meta-row">
+    <span class="meta-badge"><i class="ti ti-shield-check" style="font-size:11px;"></i> UN뉴스</span>
+    <span class="meta-badge"><i class="ti ti-shield-check" style="font-size:11px;"></i> 유니세프</span>
+    <span class="meta-badge"><i class="ti ti-shield-check" style="font-size:11px;"></i> UNDP</span>
+    <span id="streak-badge"><i class="ti ti-star" style="font-size:11px;"></i> 탐구 완료 <span id="cnt">0</span>건</span>
+  </div>
+
+  <div class="steps">
+    <div class="sd" id="s1"></div>
+    <div class="sd" id="s2"></div>
+    <div class="sd" id="s3"></div>
+    <span class="step-lbl" id="step-lbl">뉴스를 가져와 시작하세요</span>
+  </div>
+
+  <div id="news-card">
+    <div id="news-card-top">
+      <div class="nsrc"><i class="ti ti-shield-check" style="font-size:12px;"></i><span id="nsrc-txt">준비 중</span></div>
+      <div class="ntitle" id="ntitle">뉴스 가져오기 버튼을 눌러 시작하세요</div>
+      <div class="nbody" id="nbody">UN·유니세프·UNDP 공식 기사 기반으로 세계 문제를 탐구하고, SDGs와 연결해봅니다.</div>
+    </div>
+    <div id="news-card-foot">
+      <div class="ntags" id="ntags"></div>
+      <a class="nlink" id="nlink" href="#" style="display:none" target="_blank" rel="noopener">
+        <i class="ti ti-external-link" style="font-size:11px;"></i> 원문 보기
+      </a>
+    </div>
+  </div>
+
+  <div id="hint-box"></div>
+
+  <div id="action-row">
+    <button class="btn-outline" id="fetch-btn" onclick="fetchNews()">
+      <i class="ti ti-refresh"></i> 뉴스 가져오기
+    </button>
+    <button class="btn-outline" id="hint-btn" onclick="toggleHint()" style="display:none;">
+      <i class="ti ti-bulb"></i> 힌트
+    </button>
+  </div>
+
+  <div id="sdg-sec">
+    <h2><i class="ti ti-circle-check" style="font-size:14px;"></i>이 기사와 관련 있는 SDGs를 골라보세요 (여러 개 가능)</h2>
+    <div id="sdg-grid"></div>
+  </div>
+
+  <div id="life-sec">
+    <h2><i class="ti ti-map-pin" style="font-size:14px;"></i>이 문제가 우리 생활과 어떻게 연결될까요?</h2>
+    <textarea id="life-input" rows="3" placeholder="예) 우리가 물을 낭비하면 물 부족 나라에도 영향을 줄 수 있어요..."></textarea>
+    <div class="lp-row">
+      <button class="lp" onclick="setLP('우리가 매일 쓰는 ')">우리가 매일 쓰는...</button>
+      <button class="lp" onclick="setLP('우리 학교에서는 ')">우리 학교에서는...</button>
+      <button class="lp" onclick="setLP('나는 이 문제를 위해 ')">나는 이 문제를 위해...</button>
+      <button class="lp" onclick="setLP('한국에서도 비슷하게 ')">한국에서도 비슷하게...</button>
+    </div>
+  </div>
+
+  <button id="sub-btn" onclick="analyze()">
+    <i class="ti ti-lens"></i> SDGs 렌즈로 분석하기
+  </button>
+
+  <div id="res-sec">
+    <div class="rc">
+      <div class="rc-label">렌즈 분석 결과</div>
+      <div class="rchips" id="res-correct"></div>
+      <div class="rtext" id="res-feedback"></div>
+      <div class="score-row">
+        <div class="score-ico" id="score-ico"></div>
+        <div>
+          <div class="score-num" id="score-num"></div>
+          <div class="score-sub" id="score-sub"></div>
+        </div>
+      </div>
+    </div>
+    <div class="rc">
+      <div class="rc-label">우리 생활과의 연결</div>
+      <div class="life-box" id="res-life"></div>
+    </div>
+    <div class="rc" id="bonus-card" style="display:none;">
+      <div class="rc-label">오늘의 실천 미션</div>
+      <div class="bonus-box" id="res-bonus"></div>
+    </div>
+    <button id="next-btn" onclick="nextNews()">
+      <i class="ti ti-arrow-right"></i> 다음 뉴스 탐구하기
+    </button>
+  </div>
+
+  <footer>
+    SDGs 렌즈 · 교육뮤지컬 꿈꾸는 치수쌤 |
+    <a href="https://litt.ly/chichiboo" target="_blank" rel="noopener">litt.ly/chichiboo</a>
+  </footer>
+</div>
+
+<script>
+const SDG_DATA=[
+  {n:1,label:'빈곤퇴치',c:'#E5243B'},{n:2,label:'기아종식',c:'#DDA63A'},
+  {n:3,label:'건강과복지',c:'#4C9F38'},{n:4,label:'양질의교육',c:'#C5192D'},
+  {n:5,label:'성평등',c:'#FF3A21'},{n:6,label:'깨끗한물',c:'#26BDE2'},
+  {n:7,label:'청정에너지',c:'#FCC30B'},{n:8,label:'양질의일자리',c:'#A21942'},
+  {n:9,label:'산업과혁신',c:'#FD6925'},{n:10,label:'불평등감소',c:'#DD1367'},
+  {n:11,label:'지속가능도시',c:'#FD9D24'},{n:12,label:'책임있는소비',c:'#BF8B2E'},
+  {n:13,label:'기후행동',c:'#3F7E44'},{n:14,label:'해양생태계',c:'#0A97D9'},
+  {n:15,label:'육상생태계',c:'#56C02B'},{n:16,label:'평화와정의',c:'#00689D'},
+  {n:17,label:'글로벌파트너십',c:'#19486A'},
+];
+const NEWS_DB=[
+  {source:'UN뉴스',title:'전 세계 7억 3천만 명이 여전히 극심한 굶주림에 시달려',body:'유엔 식량농업기구(FAO)는 2024년 보고서에서 전 세계 약 7억 3천만 명이 만성적인 식량 부족 상태에 있다고 밝혔습니다. 특히 사하라 이남 아프리카와 남아시아에서 상황이 심각하며, 기후 변화와 분쟁이 주요 원인으로 꼽힙니다. 어린이 영양실조도 여전히 심각한 문제로 남아 있습니다.',tags:['식량','기아','아프리카','FAO'],url:'https://news.un.org/en/story/2024/07/1152236',correct:[2,1,13,17],hint:'음식이 부족한 사람들과 관련된 목표, 그리고 그 원인인 기후와 가난을 생각해보세요.',fc:'훌륭해요! 기아(SDG 2)가 핵심이지만, 빈곤(SDG 1), 기후변화(SDG 13), 국제 협력(SDG 17)과도 깊이 연결되어 있어요.',fp:'좋은 시작이에요! 기아(SDG 2)를 찾았나요? 빈곤(SDG 1)과 기후변화(SDG 13)도 함께 생각해보세요.',fm:'기사에서 "굶주림"이라는 단어를 주목해보세요. 식량 문제와 기후변화의 관계도 생각해보세요.',lc:'우리가 음식을 낭비하지 않고 급식을 남기지 않는 것도 SDG 2 실천이에요!',bonus:'오늘 급식에서 음식을 하나도 남기지 않아 보세요. 먹지 못하는 친구들을 생각하며 감사히 먹는 것도 세계시민 행동이에요.'},
+  {source:'유니세프',title:'기후변화로 어린이 10억 명이 위험에 처해 있어',body:'유니세프는 기후변화로 인해 전 세계 어린이 약 10억 명이 폭염, 홍수, 사이클론 등 극단적 기상 현상에 매우 취약한 환경에서 살고 있다고 경고했습니다. 특히 남아시아와 사하라 이남 아프리카 지역 어린이들이 가장 큰 위험에 노출되어 있으며, 이는 교육 기회 박탈과 건강 문제로 이어지고 있습니다.',tags:['기후변화','어린이','폭염','홍수'],url:'https://www.unicef.org/press-releases/1-billion-children',correct:[13,3,4,1],hint:'기후 위기와 직접 관련된 목표, 건강·교육에 미치는 영향을 생각해보세요.',fc:'완벽해요! 기후행동(SDG 13), 건강(SDG 3), 교육(SDG 4), 빈곤(SDG 1)까지 연결한 뛰어난 분석이에요!',fp:'기후행동(SDG 13)은 필수예요. 건강(SDG 3)과 학교생활(SDG 4)에도 영향을 미쳐요.',fm:'"기후변화"에서 SDG를 찾고, 건강과 교육에 어떤 영향을 주는지도 연결해보세요.',lc:'우리가 전기를 아끼고 일회용품을 줄이는 것이 먼 나라 어린이들의 미래와 연결된 행동이랍니다.',bonus:'오늘 사용하지 않는 전등과 전자기기 플러그를 뽑아보세요. 가족에게도 이유를 설명해보세요.'},
+  {source:'UN뉴스',title:'전 세계 여학생 1억 2천만 명 학교 밖에 있어',body:'유네스코 보고서에 따르면 전 세계적으로 약 1억 2천만 명의 여학생이 학교에 다니지 못하고 있습니다. 빈곤, 조혼 문화, 성차별, 안전 문제 등이 주요 원인이며, 교육 격차는 취업 기회와 소득 불평등으로도 이어집니다. 특히 분쟁 지역 여학생들의 상황이 더욱 심각합니다.',tags:['교육','여학생','성평등','유네스코'],url:'https://news.un.org/en/story/2024/03/1147712',correct:[4,5,1,10],hint:'학교에 못 가는 여학생들과 관련된 교육 목표와 성별 불평등 목표를 찾아보세요.',fc:'훌륭해요! 교육(SDG 4)과 성평등(SDG 5)이 핵심이고, 빈곤(SDG 1)과 불평등(SDG 10)까지 연결했어요!',fp:'교육(SDG 4)은 찾았나요? "여학생"에서 성별 관련 SDG도 찾아보세요.',fm:'"여학생이 학교에 못 간다"에서 교육·성별 관련 SDG를 찾아보세요.',lc:'학교에서 열심히 배우는 것 자체가 SDG 4를 실천하는 거랍니다.',bonus:'오늘 수업에서 배운 내용 한 가지를 가족에게 가르쳐주세요. 배움을 나누는 것도 교육 나눔이에요.'},
+  {source:'유니세프',title:'깨끗한 물 없이 생활하는 어린이 4억 5천만 명',body:'유니세프와 세계보건기구(WHO)의 공동 보고서에 따르면, 전 세계 4억 5천만 명의 어린이가 안전한 식수 없이 생활하고 있습니다. 오염된 물 사용으로 인한 설사병은 5세 미만 어린이 사망의 주요 원인 중 하나입니다. 기후변화로 인한 가뭄과 홍수가 상황을 악화시키고 있습니다.',tags:['식수','위생','어린이','WHO'],url:'https://www.unicef.org/reports/water-under-fire',correct:[6,3,13,1],hint:'"물"과 직접 관련된 SDG를 찾고, 오염된 물이 건강에 미치는 영향도 생각해보세요.',fc:'완벽해요! 깨끗한 물(SDG 6), 건강(SDG 3), 기후변화(SDG 13), 빈곤(SDG 1)까지 완벽히 연결했어요!',fp:'깨끗한 물(SDG 6)이 핵심이에요. 건강 문제(SDG 3)도 함께 생각해보세요.',fm:'"깨끗한 물"을 SDGs에서 찾고, 오염된 물과 건강의 관계도 생각해보세요.',lc:'양치할 때 컵을 사용해 물 절약을 실천해보세요.',bonus:'오늘 물을 사용할 때마다 "이 물은 어디서 올까?"를 생각하고, 물 절약 방법 3가지를 적어보세요.'},
+  {source:'UNDP',title:'해양 플라스틱 오염, 2040년까지 3배 증가 전망',body:'유엔환경계획(UNEP)은 현재 추세가 계속된다면 2040년까지 해양으로 유입되는 플라스틱 양이 지금의 3배에 달할 것이라고 경고했습니다. 매년 800만 톤 이상의 플라스틱이 바다로 흘러들어 해양 생태계를 파괴하고 먹이사슬을 통해 인간에게도 영향을 줍니다. 각국 정부의 플라스틱 협약 체결이 시급합니다.',tags:['플라스틱','해양오염','생태계','UNEP'],url:'https://www.unep.org/news-and-stories/press-release/plastic-pollution',correct:[14,12,17,3],hint:'"바다"와 관련된 SDG와 플라스틱 소비 관련 목표를 생각해보세요.',fc:'탁월해요! 해양생태계(SDG 14), 책임있는 소비(SDG 12), 국제 협약(SDG 17), 건강(SDG 3)까지 완벽해요!',fp:'해양생태계(SDG 14)는 꼭 포함해야 해요. 플라스틱을 줄이는 소비 관련 SDG도 찾아보세요.',fm:'"해양"에서 바다 관련 SDG를, 플라스틱 소비 습관에서 또 다른 SDG를 찾아보세요.',lc:'일회용 플라스틱 컵 하나를 덜 쓰는 것이 바다를 지키는 행동이에요.',bonus:'오늘 하루 일회용 플라스틱을 하나도 사용하지 않는 "플라스틱 프리 챌린지"에 도전해보세요.'},
+  {source:'UN뉴스',title:'분쟁 지역 어린이 4천만 명 교육 위기',body:'유엔은 현재 전 세계 분쟁 지역에서 약 4천만 명의 어린이가 학교 교육을 받지 못하고 있다고 발표했습니다. 우크라이나, 수단, 가자지구, 미얀마 등지에서 학교 시설이 파괴되거나 어린이들이 피란길에 오르면서 교육이 중단되고 있습니다. 교육의 단절은 미래 세대의 빈곤 악순환으로 이어질 수 있습니다.',tags:['분쟁','교육','어린이','난민'],url:'https://news.un.org/en/story/2024/09/1154321',correct:[4,16,1,10],hint:'전쟁·분쟁 관련 SDG와 교육 기회 박탈 관련 SDG를 찾아보세요.',fc:'훌륭해요! 교육(SDG 4)과 평화(SDG 16)가 핵심이고, 빈곤(SDG 1)과 불평등(SDG 10)까지 완벽히 연결했어요!',fp:'교육(SDG 4)은 반드시 포함해야 해요. "분쟁 지역"에서 평화 관련 SDG도 찾아보세요.',fm:'"분쟁"과 "교육"이 두 핵심 단어예요. 각각 관련 SDG를 찾아보세요.',lc:'평화로운 환경에서 학교를 다닐 수 있는 것이 얼마나 소중한지 생각해보세요.',bonus:'학급 친구 중 도움이 필요한 친구가 있는지 생각해보고, 오늘 한 명에게 먼저 말을 걸어보세요.'},
+  {source:'유니세프',title:'코로나 이후 어린이 백신 접종률 여전히 회복 안 돼',body:'유니세프와 WHO는 코로나19 팬데믹 이후 전 세계 어린이 백신 접종률이 아직 팬데믹 이전 수준을 회복하지 못했다고 밝혔습니다. 약 6700만 명의 어린이가 코로나 기간 동안 정기 예방접종을 놓쳤으며, 홍역, 소아마비 등 예방 가능한 질병 발생이 다시 증가하고 있습니다.',tags:['백신','보건','어린이','코로나'],url:'https://www.unicef.org/press-releases/children-missed-vaccinations',correct:[3,1,10,17],hint:'"백신"과 "건강"이 핵심이에요. 가난한 나라에서 더 심각한 불평등 측면도 생각해보세요.',fc:'완벽해요! 건강(SDG 3), 빈곤(SDG 1), 불평등(SDG 10), 국제 협력(SDG 17)까지 연결했어요!',fp:'건강(SDG 3)은 꼭 포함해야 해요. 불평등 측면도 생각해보세요.',fm:'"백신 접종"은 어떤 SDG와 관련 있나요? 건강 관련 목표를 찾아보세요.',lc:'나의 건강을 잘 챙기는 것도 세계시민 의식의 시작이에요.',bonus:'오늘 내가 받은 예방접종 기록을 부모님과 함께 확인해보세요.'},
+  {source:'UNDP',title:'지구 평균 기온, 산업화 이전 대비 1.5°C 첫 돌파',body:'세계기상기구(WMO)는 2024년이 관측 역사상 지구 평균 기온이 산업화 이전 수준보다 1.5°C 이상 높아진 첫 번째 해가 될 가능성이 높다고 발표했습니다. 이상 폭염, 초강력 태풍, 전례 없는 산불이 이를 뒷받침합니다. 파리협정 목표 달성을 위한 각국의 즉각적인 온실가스 감축이 촉구되고 있습니다.',tags:['기후변화','지구온난화','파리협정','WMO'],url:'https://news.un.org/en/story/2024/11/1156789',correct:[13,7,17,11],hint:'기후변화 관련 SDG와 에너지 전환 관련 SDG를 찾아보세요.',fc:'탁월해요! 기후행동(SDG 13), 청정에너지(SDG 7), 국제 협력(SDG 17), 지속가능 도시(SDG 11)까지 완벽해요!',fp:'기후행동(SDG 13)은 핵심이에요. 에너지 관련 SDG도 함께 생각해보세요.',fm:'"기온 상승"과 "기후"에서 SDG를 찾고, 에너지 문제와도 연결해보세요.',lc:'석탄 대신 태양광·풍력 전기를 쓰려는 노력이 지구 온도를 낮추는 데 도움이 돼요.',bonus:'오늘 에어컨이나 히터 온도를 1도 조절하고, 가족에게 기후변화와 연결해서 설명해보세요.'},
+];
+
+let cur=null,sel=[],done=0,used=[],hintOpen=false;
+const STEP_LABELS=['뉴스를 가져와 시작하세요','관련 SDGs를 선택하세요','생활 연계를 작성하고 분석하세요'];
+
+function setStep(s){
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className='sd'+(i+1<s?' ok':i+1===s?' on':'');
+  });
+  document.getElementById('step-lbl').textContent=STEP_LABELS[s-1]||'';
+}
+
+function buildGrid(){
+  const g=document.getElementById('sdg-grid');
+  SDG_DATA.forEach(sdg=>{
+    const d=document.createElement('div');
+    d.className='sc';d.id='sc'+sdg.n;
+    d.style.background=sdg.c;
+    d.innerHTML=`<span class="sn">${sdg.n}</span><span class="sl">${sdg.label}</span>`;
+    d.onclick=()=>toggleSDG(sdg.n,d);
+    g.appendChild(d);
+  });
+}
+
+function toggleSDG(n,el){
+  if(sel.includes(n)){sel=sel.filter(x=>x!==n);el.classList.remove('sel');}
+  else{sel.push(n);el.classList.add('sel');}
+  const show=sel.length>0;
+  document.getElementById('life-sec').style.display=show?'block':'none';
+  document.getElementById('sub-btn').style.display=show?'flex':'none';
+  setStep(show?2:1);
+}
+
+function setLP(t){const ta=document.getElementById('life-input');ta.value=t;ta.focus();}
+
+function toggleHint(){
+  hintOpen=!hintOpen;
+  document.getElementById('hint-box').style.display=hintOpen?'block':'none';
+  document.getElementById('hint-btn').innerHTML=hintOpen?
+    '<i class="ti ti-eye-off"></i> 힌트 숨기기':
+    '<i class="ti ti-bulb"></i> 힌트';
+}
+
+function fetchNews(){
+  const btn=document.getElementById('fetch-btn');
+  btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader"></i> 불러오는 중...';
+  sel=[];
+  document.querySelectorAll('.sc').forEach(c=>c.classList.remove('sel'));
+  ['life-sec','res-sec','hint-box'].forEach(id=>document.getElementById(id).style.display='none');
+  document.getElementById('sub-btn').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('life-input').value='';
+  document.getElementById('hint-btn').innerHTML='<i class="ti ti-bulb"></i> 힌트';
+  document.getElementById('bonus-card').style.display='none';
+  hintOpen=false;
+  setStep(1);
+
+  if(used.length===NEWS_DB.length) used=[];
+  const avail=NEWS_DB.map((_,i)=>i).filter(i=>!used.includes(i));
+  const idx=avail[Math.floor(Math.random()*avail.length)];
+  used.push(idx);
+  cur=NEWS_DB[idx];
+
+  setTimeout(()=>{
+    document.getElementById('nsrc-txt').textContent=cur.source;
+    document.getElementById('ntitle').textContent=cur.title;
+    document.getElementById('nbody').textContent=cur.body;
+    document.getElementById('ntags').innerHTML=cur.tags.map(t=>`<span class="ntag">#${t}</span>`).join('');
+    const nl=document.getElementById('nlink');
+    nl.href=cur.url; nl.style.display='inline-flex';
+    document.getElementById('hint-box').textContent=cur.hint;
+    document.getElementById('hint-btn').style.display='inline-flex';
+    btn.disabled=false;
+    btn.innerHTML='<i class="ti ti-refresh"></i> 다른 뉴스 보기';
+    setStep(1);
+  },350);
+}
+
+function analyze(){
+  if(!cur||sel.length===0) return;
+  setStep(3);
+  const correct=cur.correct;
+  const hit=sel.filter(n=>correct.includes(n));
+  const score=Math.round((hit.length/correct.length)*100);
+  let feedback,ico,label;
+  if(hit.length===correct.length&&sel.length===correct.length){feedback=cur.fc;ico='🏆';label='완벽한 SDGs 렌즈!';}
+  else if(hit.length>=Math.ceil(correct.length/2)){feedback=cur.fp;ico='⭐';label='훌륭한 탐구 실력!';}
+  else{feedback=cur.fm;ico='🔍';label='다음엔 더 잘할 수 있어요!';}
+
+  document.getElementById('res-correct').innerHTML=correct.map(n=>{
+    const s=SDG_DATA[n-1];
+    return `<span class="rchip${sel.includes(n)?'':' miss'}" style="background:${s.c}">SDG ${n}: ${s.label}</span>`;
+  }).join('');
+  document.getElementById('res-feedback').textContent=feedback;
+  document.getElementById('score-ico').textContent=ico;
+  document.getElementById('score-num').textContent=label;
+  document.getElementById('score-sub').textContent=`정답 ${correct.length}개 중 ${hit.length}개 (${score}%)`;
+
+  const lifeText=document.getElementById('life-input').value.trim();
+  document.getElementById('res-life').textContent=lifeText?lifeText+'\n\n'+cur.lc:cur.lc;
+  document.getElementById('res-bonus').textContent=cur.bonus;
+  document.getElementById('bonus-card').style.display='block';
+  document.getElementById('sub-btn').style.display='none';
+  document.getElementById('res-sec').style.display='block';
+  document.getElementById('next-btn').style.display='flex';
+  done++;
+  document.getElementById('cnt').textContent=done;
+}
+
+function nextNews(){
+  document.getElementById('res-sec').style.display='none';
+  document.getElementById('next-btn').style.display='none';
+  document.getElementById('hint-btn').style.display='none';
+  fetchNews();
+}
+
+buildGrid(); setStep(1);
+</script>
+</body>
+</html>
