@@ -393,7 +393,8 @@ function init() {
     const rect = langSwitch.getBoundingClientRect();
     updatePopupActive();
     popup.style.top = (rect.bottom + 6) + 'px';
-    popup.style.left = rect.left + 'px';
+    popup.style.left = '';
+    popup.style.right = (window.innerWidth - rect.right) + 'px';
     popup.classList.toggle('open');
     e.stopPropagation();
   });

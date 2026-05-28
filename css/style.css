@@ -116,7 +116,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 #brand-text p { font-size: 13px; color: var(--text2); margin-top: 4px; font-weight: 500; }
 
-.top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.top-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .icon-btn {
   width: 44px; height: 44px;
   border: 2px solid var(--border);
