@@ -895,7 +895,10 @@ button { font-family: inherit; cursor: pointer; }
   flex-wrap: wrap;
 }
 .export-actions .btn {
-  flex: 1 1 180px;
+  flex: 1 1 160px;
+  min-height: 52px;
+  padding: 13px 18px;
+  font-size: 15px;
 }
 .export-status {
   min-height: 22px;

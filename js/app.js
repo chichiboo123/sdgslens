@@ -334,15 +334,38 @@ function drawExportCard(ctx, x, y, w, title, body, options = {}) {
   return h;
 }
 
+function getExportCanvasWidth() {
+  const pageWidth = document.querySelector('.page')?.clientWidth || window.innerWidth || 720;
+  return Math.round(Math.min(720, Math.max(320, pageWidth)));
+}
+
+function measureWrappedTextHeight(ctx, text, maxWidth, lineHeight) {
+  let textHeight = 0;
+  String(text || '').split('\n').forEach(paragraph => {
+    let line = '';
+    Array.from(paragraph).forEach(ch => {
+      const test = line + ch;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        textHeight += lineHeight;
+        line = ch.trimStart();
+      } else {
+        line = test;
+      }
+    });
+    textHeight += lineHeight;
+  });
+  return textHeight;
+}
+
 async function createExportBlob() {
   if (!cur) throw new Error('No current news');
-  const width = 1200;
+  const width = getExportCanvasWidth();
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  ctx.font = '600 20px Pretendard GOV, Pretendard, sans-serif';
+  ctx.font = '600 18px Pretendard GOV, Pretendard, sans-serif';
   const loc = newsLoc(cur, CURRENT_LANG);
   const selectedText = sel.length
-    ? sel.sort((a,b) => a-b).map(n => `SDG ${n}. ${t('sdgLabels')[n-1]}`).join('  ·  ')
+    ? [...sel].sort((a,b) => a-b).map(n => `SDG ${n}. ${t('sdgLabels')[n-1]}`).join('  ·  ')
     : '-';
   const writing = $('life-input').value.trim() || '-';
   const cards = [
@@ -350,37 +373,40 @@ async function createExportBlob() {
     ['선택한 SDGs', selectedText, { bg: '#f4f9ff' }],
     ['나의 생각', writing, { bg: '#E1FBEF', titleColor: '#0E6E55', border: '#2BB596' }],
   ];
-  const cardWidth = width - 96;
+  const margin = Math.max(22, Math.round(width * 0.06));
+  const cardWidth = width - margin * 2;
   const heights = cards.map(([title, body, options]) => {
     const m = document.createElement('canvas').getContext('2d');
-    m.font = options.bodyFont || '600 20px Pretendard GOV, Pretendard, sans-serif';
-    let textHeight = 0;
-    String(body || '').split('\n').forEach(paragraph => {
-      let line = '';
-      Array.from(paragraph).forEach(ch => {
-        const test = line + ch;
-        if (m.measureText(test).width > cardWidth - 56 && line) { textHeight += 30; line = ch.trimStart(); }
-        else line = test;
-      });
-      textHeight += 30;
-    });
-    return 56 + 34 + textHeight + 12;
+    const bodyFont = options.bodyFont || '600 18px Pretendard GOV, Pretendard, sans-serif';
+    const lineHeight = options.lineHeight || 28;
+    const pad = 28;
+    m.font = bodyFont;
+    return pad * 2 + 34 + measureWrappedTextHeight(m, body, cardWidth - pad * 2, lineHeight) + 12;
   });
-  canvas.height = 160 + heights.reduce((a,b) => a+b, 0) + 32 * (cards.length - 1) + 70;
+  canvas.width = width;
+  canvas.height = 140 + heights.reduce((a,b) => a+b, 0) + 24 * (cards.length - 1) + 56;
 
   const grad = ctx.createLinearGradient(0, 0, width, canvas.height);
   grad.addColorStop(0, '#FBF7FF'); grad.addColorStop(0.55, '#F4F9FF'); grad.addColorStop(1, '#FFF6CE');
   ctx.fillStyle = grad; ctx.fillRect(0, 0, width, canvas.height);
-  ctx.fillStyle = '#2b2348'; ctx.font = '900 44px Pretendard GOV, Pretendard, sans-serif';
-  ctx.fillText('SDGs 렌즈 탐구 기록', 48, 78);
-  ctx.fillStyle = '#5b5479'; ctx.font = '700 22px Pretendard GOV, Pretendard, sans-serif';
-  ctx.fillText(new Date().toLocaleDateString(), 48, 116);
-  let y = 160;
-  cards.forEach(([title, body, options]) => { y += drawExportCard(ctx, 48, y, cardWidth, title, body, options) + 32; });
-  ctx.fillStyle = '#8e88a8'; ctx.font = '700 18px Pretendard GOV, Pretendard, sans-serif';
-  ctx.fillText('Created with SDGs Lens', 48, canvas.height - 38);
+  ctx.fillStyle = '#2b2348'; ctx.font = '900 34px Pretendard GOV, Pretendard, sans-serif';
+  wrapCanvasText(ctx, 'SDGs 렌즈 탐구 기록', margin, 58, width - margin * 2, 42);
+  ctx.fillStyle = '#5b5479'; ctx.font = '700 18px Pretendard GOV, Pretendard, sans-serif';
+  ctx.fillText(new Date().toLocaleDateString(), margin, 100);
+  let y = 140;
+  cards.forEach(([title, body, options]) => {
+    y += drawExportCard(ctx, margin, y, cardWidth, title, body, {
+      ...options,
+      bodyFont: options.bodyFont || '600 18px Pretendard GOV, Pretendard, sans-serif',
+      lineHeight: options.lineHeight || 28,
+    }) + 24;
+  });
+  ctx.fillStyle = '#8e88a8'; ctx.font = '700 16px Pretendard GOV, Pretendard, sans-serif';
+  ctx.fillText('Created with SDGs Lens', margin, canvas.height - 30);
 
-  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas export failed')), 'image/png');
+  });
 }
 
 async function saveExportPng() {

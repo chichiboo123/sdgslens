@@ -30,10 +30,10 @@ const I18N = {
     },
     export: {
       title: '내 탐구 기록 내보내기',
-      savePng: 'PNG 저장',
-      copyPng: 'PNG 복사',
-      copied: 'PNG 그림을 클립보드에 복사했어요.',
-      copyUnsupported: '이 브라우저에서는 PNG 클립보드 복사를 지원하지 않아요. PNG 저장을 이용해 주세요.',
+      savePng: '이미지 저장',
+      copyPng: '이미지 복사',
+      copied: '이미지를 클립보드에 복사했어요.',
+      copyUnsupported: '이 브라우저에서는 PNG 클립보드 복사를 지원하지 않아요. 이미지 저장을 이용해 주세요.',
       failed: '내보내기에 실패했어요. 잠시 후 다시 시도해 주세요.',
     },
     sdg: {
