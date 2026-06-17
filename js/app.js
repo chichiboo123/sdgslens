@@ -170,6 +170,7 @@ function fetchNews() {
   $('retry-btn').style.display = 'none';
   $('life-input').value = '';
   $('bonus-card').style.display = 'none';
+  $('export-card').style.display = 'none';
   $('sel-count').hidden = true;
   $('hint-btn').classList.remove('is-active');
   hintOpen = false;
@@ -233,6 +234,8 @@ function analyze() {
   $('res-life').textContent = lifeText ? lifeText + '\n\n' + loc.lc : loc.lc;
   $('res-bonus').textContent = loc.bonus;
   $('bonus-card').style.display = 'block';
+  $('export-card').style.display = 'block';
+  $('export-status').textContent = '';
   $('sub-btn').style.display = 'none';
   $('res-sec').style.display = 'block';
   $('next-btn').style.display = 'inline-flex';
@@ -244,6 +247,7 @@ function analyze() {
 
 function nextNews() {
   $('res-sec').style.display = 'none';
+  $('export-card').style.display = 'none';
   $('next-btn').style.display = 'none';
   $('retry-btn').style.display = 'none';
   $('hint-btn').style.display = 'none';
@@ -254,6 +258,7 @@ function retryNews() {
   sel = [];
   document.querySelectorAll('.sc').forEach(c => { c.classList.remove('sel'); c.setAttribute('aria-pressed','false'); });
   $('res-sec').style.display = 'none';
+  $('export-card').style.display = 'none';
   $('next-btn').style.display = 'none';
   $('retry-btn').style.display = 'none';
   $('life-sec').style.display = 'none';
@@ -261,6 +266,171 @@ function retryNews() {
   $('sel-count').hidden = true;
   setStep(1);
   $('news-card').scrollIntoView({behavior: 'smooth', block: 'start'});
+}
+
+
+/* ---------------- Export ---------------- */
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight) {
+  const paragraphs = String(text || '').split('\n');
+  const lines = [];
+  paragraphs.forEach(paragraph => {
+    let line = '';
+    Array.from(paragraph).forEach(ch => {
+      const test = line + ch;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = ch.trimStart();
+      } else {
+        line = test;
+      }
+    });
+    lines.push(line || ' ');
+  });
+  lines.forEach(line => { ctx.fillText(line, x, y); y += lineHeight; });
+  return y;
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawExportCard(ctx, x, y, w, title, body, options = {}) {
+  const pad = 28;
+  ctx.font = '900 23px Pretendard GOV, Pretendard, sans-serif';
+  const lineHeight = options.lineHeight || 30;
+  const bodyFont = options.bodyFont || '600 20px Pretendard GOV, Pretendard, sans-serif';
+  ctx.font = bodyFont;
+  let textHeight = 0;
+  String(body || '').split('\n').forEach(paragraph => {
+    let line = '';
+    Array.from(paragraph).forEach(ch => {
+      const test = line + ch;
+      if (ctx.measureText(test).width > w - pad * 2 && line) {
+        textHeight += lineHeight;
+        line = ch.trimStart();
+      } else line = test;
+    });
+    textHeight += lineHeight;
+  });
+  const h = pad * 2 + 34 + textHeight + 12;
+  ctx.fillStyle = options.bg || '#ffffff';
+  roundRect(ctx, x, y, w, h, 24);
+  ctx.fill();
+  ctx.strokeStyle = options.border || 'rgba(120, 90, 200, 0.18)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.fillStyle = options.titleColor || '#6839c4';
+  ctx.font = '900 23px Pretendard GOV, Pretendard, sans-serif';
+  ctx.fillText(title, x + pad, y + pad + 20);
+  ctx.fillStyle = options.bodyColor || '#2b2348';
+  ctx.font = bodyFont;
+  wrapCanvasText(ctx, body, x + pad, y + pad + 62, w - pad * 2, lineHeight);
+  return h;
+}
+
+function getExportCanvasWidth() {
+  const pageWidth = document.querySelector('.page')?.clientWidth || window.innerWidth || 720;
+  return Math.round(Math.min(720, Math.max(320, pageWidth)));
+}
+
+function measureWrappedTextHeight(ctx, text, maxWidth, lineHeight) {
+  let textHeight = 0;
+  String(text || '').split('\n').forEach(paragraph => {
+    let line = '';
+    Array.from(paragraph).forEach(ch => {
+      const test = line + ch;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        textHeight += lineHeight;
+        line = ch.trimStart();
+      } else {
+        line = test;
+      }
+    });
+    textHeight += lineHeight;
+  });
+  return textHeight;
+}
+
+async function createExportBlob() {
+  if (!cur) throw new Error('No current news');
+  const width = getExportCanvasWidth();
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = '600 18px Pretendard GOV, Pretendard, sans-serif';
+  const loc = newsLoc(cur, CURRENT_LANG);
+  const selectedText = sel.length
+    ? [...sel].sort((a,b) => a-b).map(n => `SDG ${n}. ${t('sdgLabels')[n-1]}`).join('  ·  ')
+    : '-';
+  const writing = $('life-input').value.trim() || '-';
+  const cards = [
+    ['뉴스 기사', `${loc.source}\n${loc.title}\n\n${loc.body}`, {}],
+    ['선택한 SDGs', selectedText, { bg: '#f4f9ff' }],
+    ['나의 생각', writing, { bg: '#E1FBEF', titleColor: '#0E6E55', border: '#2BB596' }],
+  ];
+  const margin = Math.max(22, Math.round(width * 0.06));
+  const cardWidth = width - margin * 2;
+  const heights = cards.map(([title, body, options]) => {
+    const m = document.createElement('canvas').getContext('2d');
+    const bodyFont = options.bodyFont || '600 18px Pretendard GOV, Pretendard, sans-serif';
+    const lineHeight = options.lineHeight || 28;
+    const pad = 28;
+    m.font = bodyFont;
+    return pad * 2 + 34 + measureWrappedTextHeight(m, body, cardWidth - pad * 2, lineHeight) + 12;
+  });
+  canvas.width = width;
+  canvas.height = 140 + heights.reduce((a,b) => a+b, 0) + 24 * (cards.length - 1) + 56;
+
+  const grad = ctx.createLinearGradient(0, 0, width, canvas.height);
+  grad.addColorStop(0, '#FBF7FF'); grad.addColorStop(0.55, '#F4F9FF'); grad.addColorStop(1, '#FFF6CE');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, width, canvas.height);
+  ctx.fillStyle = '#2b2348'; ctx.font = '900 34px Pretendard GOV, Pretendard, sans-serif';
+  wrapCanvasText(ctx, 'SDGs 렌즈 탐구 기록', margin, 58, width - margin * 2, 42);
+  ctx.fillStyle = '#5b5479'; ctx.font = '700 18px Pretendard GOV, Pretendard, sans-serif';
+  ctx.fillText(new Date().toLocaleDateString(), margin, 100);
+  let y = 140;
+  cards.forEach(([title, body, options]) => {
+    y += drawExportCard(ctx, margin, y, cardWidth, title, body, {
+      ...options,
+      bodyFont: options.bodyFont || '600 18px Pretendard GOV, Pretendard, sans-serif',
+      lineHeight: options.lineHeight || 28,
+    }) + 24;
+  });
+  ctx.fillStyle = '#8e88a8'; ctx.font = '700 16px Pretendard GOV, Pretendard, sans-serif';
+  ctx.fillText('Created with SDGs Lens', margin, canvas.height - 30);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Canvas export failed')), 'image/png');
+  });
+}
+
+async function saveExportPng() {
+  try {
+    const blob = await createExportBlob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `sdgs-lens-${Date.now()}.png`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    $('export-status').textContent = '';
+  } catch (e) { $('export-status').textContent = t('export.failed'); }
+}
+
+async function copyExportPng() {
+  try {
+    if (!navigator.clipboard || !window.ClipboardItem) {
+      $('export-status').textContent = t('export.copyUnsupported');
+      return;
+    }
+    const blob = await createExportBlob();
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+    $('export-status').textContent = t('export.copied');
+  } catch (e) { $('export-status').textContent = t('export.failed'); }
 }
 
 /* ---------------- Modal ---------------- */
@@ -353,6 +523,8 @@ function init() {
   $('sub-btn').addEventListener('click', analyze);
   $('next-btn').addEventListener('click', nextNews);
   $('retry-btn').addEventListener('click', retryNews);
+  $('export-save-btn').addEventListener('click', saveExportPng);
+  $('export-copy-btn').addEventListener('click', copyExportPng);
   $('help-btn').addEventListener('click', openHelp);
   $('dict-btn').addEventListener('click', openDict);
   $('help-modal').querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeHelp));

@@ -400,11 +400,11 @@ button { font-family: inherit; cursor: pointer; }
 .sec-help { font-size: 13px; color: var(--text3); margin-bottom: 14px; font-weight: 500; }
 #sdg-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
   gap: 9px;
 }
 .sc {
-  padding: 14px 5px;
+  padding: 16px 8px;
   border-radius: 16px;
   border: 3px solid transparent;
   cursor: pointer;
@@ -435,8 +435,8 @@ button { font-family: inherit; cursor: pointer; }
   animation: pop .35s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes pop { 0% { transform: scale(0); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
-.sc .sn { font-size: 19px; font-weight: 900; color: white; display: block; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
-.sc .sl { font-size: 10px; color: rgba(255,255,255,.98); display: block; line-height: 1.25; margin-top: 3px; font-weight: 700; text-shadow: 0 1px 1px rgba(0,0,0,.15); }
+.sc .sn { font-size: 22px; font-weight: 900; color: white; display: block; text-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.sc .sl { font-size: 14px; color: rgba(255,255,255,.98); display: block; line-height: 1.28; margin: 5px auto 0; font-weight: 800; text-shadow: 0 1px 1px rgba(0,0,0,.15); word-break: keep-all; overflow-wrap: normal; max-width: 92px; }
 
 /* ── Life section ── */
 #life-sec { display: none; margin-bottom: 1.5rem; }
@@ -865,4 +865,45 @@ button { font-family: inherit; cursor: pointer; }
       linear-gradient(180deg, #1c1830 0%, #221a36 100%);
   }
   #dict-body h4 .material-symbols-rounded { color: var(--teal2); }
+}
+
+/* ── Export ── */
+.export-card {
+  background: linear-gradient(135deg, var(--bg) 0%, var(--blue-bg) 100%);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-md);
+}
+.export-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 900;
+}
+.export-title .material-symbols-rounded {
+  color: var(--teal);
+  font-variation-settings: 'FILL' 1, 'wght' 700;
+}
+.export-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.export-actions .btn {
+  flex: 1 1 160px;
+  min-height: 52px;
+  padding: 13px 18px;
+  font-size: 15px;
+}
+.export-status {
+  min-height: 22px;
+  margin-top: 10px;
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 700;
 }

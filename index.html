@@ -139,6 +139,20 @@
       <div class="rc-label" data-i18n="result.bonusTitle"></div>
       <div class="bonus-box" id="res-bonus"></div>
     </div>
+    <div class="export-card" id="export-card" style="display:none;">
+      <div class="export-title"><span class="material-symbols-rounded">ios_share</span> <span data-i18n="export.title"></span></div>
+      <div class="export-actions">
+        <button id="export-save-btn" class="btn btn-outline" type="button">
+          <span class="material-symbols-rounded">download</span>
+          <span data-i18n="export.savePng"></span>
+        </button>
+        <button id="export-copy-btn" class="btn btn-outline" type="button">
+          <span class="material-symbols-rounded">content_copy</span>
+          <span data-i18n="export.copyPng"></span>
+        </button>
+      </div>
+      <div class="export-status" id="export-status" role="status" aria-live="polite"></div>
+    </div>
     <div class="result-actions">
       <button id="next-btn" class="btn btn-outline-strong">
         <span class="material-symbols-rounded">arrow_forward</span>
